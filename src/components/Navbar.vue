@@ -34,13 +34,13 @@
           </template>
 
           <template v-else>
-            <router-link
-              to="/"
+            <button
+              @click="showLoginModal = true"
               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
             >
               <span class="material-icons text-sm">login</span>
               <span>ログイン</span>
-            </router-link>
+            </button>
           </template>
         </div>
 
@@ -84,19 +84,21 @@
             </template>
 
             <template v-else>
-              <router-link
-                to="/"
-                @click="mobileMenuOpen = false"
-                class="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+              <button
+                @click="showLoginModal = true; mobileMenuOpen = false"
+                class="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors w-full"
               >
                 <span class="material-icons text-sm">login</span>
                 <span>ログイン</span>
-              </router-link>
+              </button>
             </template>
           </div>
         </div>
       </Transition>
     </div>
+
+    <!-- ログインモーダル -->
+    <LoginModal v-model="showLoginModal" />
   </nav>
 </template>
 
@@ -107,6 +109,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import ThemeToggle from './ThemeToggle.vue'
+import LoginModal from './LoginModal.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -114,6 +117,7 @@ const toast = useToast()
 
 const { isAuthenticated } = storeToRefs(authStore)
 const mobileMenuOpen = ref(false)
+const showLoginModal = ref(false)
 
 async function handleSignOut() {
   mobileMenuOpen.value = false
