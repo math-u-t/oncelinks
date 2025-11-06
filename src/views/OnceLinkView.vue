@@ -85,10 +85,8 @@ const content = ref(null)
 
 /**
  * 一度リンクの核心ロジック
- * 1. トークンでリンクを取得（is_active=trueのみ）
- * 2. 有効期限をチェック
- * 3. コンテンツを表示
- * 4. 即座にリンクを無効化
+ * RPC関数を使用してアトミックに取得と無効化を実行
+ * これにより、複数の同時アクセスでも確実に1回だけ表示される
  */
 onMounted(async () => {
   const token = route.params.token
@@ -100,25 +98,16 @@ onMounted(async () => {
   }
 
   try {
-    // 1. アクティブなリンクのみ取得
-    const link = await linksStore.fetchLinkByToken(token)
+    // RPC関数でアトミックに取得と無効化を実行
+    // 有効期限チェック、削除済みチェック、is_activeチェックはRPC内で実行
+    const link = await linksStore.fetchAndDeactivateLink(token)
 
     if (!link) {
       throw new Error('リンクが存在しないか、既に無効化されています')
     }
 
-    // 2. 有効期限チェック
-    if (link.expires_at && new Date(link.expires_at) < new Date()) {
-      // 有効期限切れの場合も無効化
-      await linksStore.deactivateLink(link.id)
-      throw new Error('このリンクは有効期限切れです')
-    }
-
-    // 3. コンテンツを表示
+    // コンテンツを表示
     content.value = link.html_content
-
-    // 4. 即座に無効化（表示と同時に実行）
-    await linksStore.deactivateLink(link.id)
 
   } catch (err) {
     console.error('リンク取得エラー:', err)

@@ -57,12 +57,23 @@
         <span class="text-sm font-medium">コピー</span>
       </button>
 
-      <!-- 削除ボタン -->
+      <!-- 編集ボタン（アクティブなリンクのみ） -->
       <button
-        @click="handleDelete"
+        v-if="link.is_active"
+        @click="handleEdit"
+        class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40
+               text-blue-600 dark:text-blue-400 transition-colors"
+        aria-label="編集"
+      >
+        <span class="material-icons text-sm">edit</span>
+      </button>
+
+      <!-- ゴミ箱ボタン -->
+      <button
+        @click="handleMoveToTrash"
         class="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40
                text-red-600 dark:text-red-400 transition-colors"
-        aria-label="削除"
+        aria-label="ゴミ箱に移動"
       >
         <span class="material-icons text-sm">delete</span>
       </button>
@@ -72,6 +83,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useLinksStore } from '@/stores/links'
 
@@ -82,8 +94,9 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'moveToTrash'])
 
+const router = useRouter()
 const toast = useToast()
 const linksStore = useLinksStore()
 
@@ -127,8 +140,18 @@ async function copyLink() {
   }
 }
 
+function handleEdit() {
+  router.push(`/edit/${props.link.id}`)
+}
+
+function handleMoveToTrash() {
+  if (confirm('このリンクをゴミ箱に移動してもよろしいですか？')) {
+    emit('moveToTrash', props.link.id)
+  }
+}
+
 function handleDelete() {
-  if (confirm('このリンクを削除してもよろしいですか？')) {
+  if (confirm('このリンクを完全に削除してもよろしいですか？この操作は取り消せません。')) {
     emit('delete', props.link.id)
   }
 }

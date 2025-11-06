@@ -12,15 +12,39 @@
           </p>
         </div>
 
-        <router-link
-          to="/new"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-lg
-                 bg-indigo-600 hover:bg-indigo-700 text-white
-                 transition-colors shadow-md hover:shadow-lg"
-        >
-          <span class="material-icons">add</span>
-          <span class="font-medium">新規リンク作成</span>
-        </router-link>
+        <div class="flex gap-3">
+          <router-link
+            to="/trash"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+                   bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
+                   text-gray-700 dark:text-gray-300
+                   transition-colors"
+          >
+            <span class="material-icons text-sm">delete</span>
+            <span>ゴミ箱</span>
+          </router-link>
+
+          <router-link
+            to="/settings"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+                   bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
+                   text-gray-700 dark:text-gray-300
+                   transition-colors"
+          >
+            <span class="material-icons text-sm">settings</span>
+            <span>設定</span>
+          </router-link>
+
+          <router-link
+            to="/new"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg
+                   bg-indigo-600 hover:bg-indigo-700 text-white
+                   transition-colors shadow-md hover:shadow-lg"
+          >
+            <span class="material-icons">add</span>
+            <span class="font-medium">新規リンク作成</span>
+          </router-link>
+        </div>
       </div>
 
       <!-- ローディング状態 -->
@@ -58,14 +82,54 @@
         </router-link>
       </div>
 
+      <!-- 統計情報 -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+              <span class="material-icons text-indigo-600 dark:text-indigo-400">link</span>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">総リンク数</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ linkCount }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+              <span class="material-icons text-green-600 dark:text-green-400">check_circle</span>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">アクティブ</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ activeLinks.length }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
+              <span class="material-icons text-gray-600 dark:text-gray-400">cancel</span>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">使用済み</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ inactiveLinks.length }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- リンク一覧 -->
-      <div v-else>
+      <div v-if="links.length > 0">
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <LinkCard
             v-for="link in links"
             :key="link.id"
             :link="link"
             @delete="handleDelete"
+            @moveToTrash="handleMoveToTrash"
           />
         </div>
       </div>
@@ -83,7 +147,7 @@ import LinkCard from '@/components/LinkCard.vue'
 const linksStore = useLinksStore()
 const toast = useToast()
 
-const { links, loading } = storeToRefs(linksStore)
+const { links, loading, activeLinks, inactiveLinks, linkCount } = storeToRefs(linksStore)
 
 onMounted(async () => {
   const { error } = await linksStore.fetchLinks()
@@ -93,6 +157,17 @@ onMounted(async () => {
   }
 })
 
+async function handleMoveToTrash(linkId) {
+  const { error } = await linksStore.moveToTrash(linkId)
+
+  if (error) {
+    toast.error('リンクの削除に失敗しました')
+    return
+  }
+
+  toast.success('リンクをゴミ箱に移動しました')
+}
+
 async function handleDelete(linkId) {
   const { error } = await linksStore.deleteLink(linkId)
 
@@ -101,6 +176,6 @@ async function handleDelete(linkId) {
     return
   }
 
-  toast.success('リンクを削除しました')
+  toast.success('リンクを完全に削除しました')
 }
 </script>

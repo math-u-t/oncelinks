@@ -21,6 +21,24 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/edit/:id',
+    name: 'edit-link',
+    component: () => import('@/views/EditLink.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/trash',
+    name: 'trash',
+    component: () => import('@/views/Trash.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('@/views/Settings.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/link/:token',
     name: 'once-link',
     component: () => import('@/views/OnceLinkView.vue'),
