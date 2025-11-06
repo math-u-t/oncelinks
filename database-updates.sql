@@ -125,6 +125,55 @@ CREATE TRIGGER update_user_profiles_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- 8. リンクを手動で無効化するRPC関数（access_count をインクリメント）
+CREATE OR REPLACE FUNCTION deactivate_link_by_id(link_id UUID)
+RETURNS TABLE (
+    id UUID,
+    user_id UUID,
+    token TEXT,
+    title TEXT,
+    html_content TEXT,
+    is_active BOOLEAN,
+    accessed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    access_count INTEGER,
+    deleted_at TIMESTAMP WITH TIME ZONE
+) AS $$
+DECLARE
+    link_record RECORD;
+BEGIN
+    -- リンクを無効化してaccess_countをインクリメント
+    UPDATE once_links
+    SET
+        is_active = false,
+        accessed_at = NOW(),
+        access_count = once_links.access_count + 1
+    WHERE
+        once_links.id = link_id
+        AND once_links.is_active = true
+    RETURNING * INTO link_record;
+
+    -- 更新された行が存在する場合のみ返す
+    IF link_record.id IS NOT NULL THEN
+        RETURN QUERY SELECT
+            link_record.id,
+            link_record.user_id,
+            link_record.token,
+            link_record.title,
+            link_record.html_content,
+            link_record.is_active,
+            link_record.accessed_at,
+            link_record.created_at,
+            link_record.updated_at,
+            link_record.expires_at,
+            link_record.access_count,
+            link_record.deleted_at;
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- 完了メッセージ
 DO $$
 BEGIN
@@ -132,5 +181,6 @@ BEGIN
     RAISE NOTICE '- リンク編集機能: updated_atカラム追加';
     RAISE NOTICE '- ゴミ箱機能: deleted_atカラム追加';
     RAISE NOTICE '- 一度きりアクセス: fetch_and_deactivate_link RPC関数追加';
+    RAISE NOTICE '- 手動無効化: deactivate_link_by_id RPC関数追加';
     RAISE NOTICE '- ユーザープロフィール: user_profilesテーブル追加';
 END $$;

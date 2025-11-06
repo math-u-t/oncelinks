@@ -7,15 +7,15 @@
           <span class="material-icons text-6xl text-indigo-600 dark:text-indigo-400">link</span>
         </div>
 
-        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
           oncelinks
         </h1>
 
-        <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-4">
+        <p class="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-4">
           一度限りアクセス可能なリンクを生成
         </p>
 
-        <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+        <p class="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto px-4">
           セキュアにHTMLコンテンツを共有。リンクは一度アクセスされると自動的に無効化されます。
         </p>
       </div>

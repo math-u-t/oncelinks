@@ -165,30 +165,27 @@ export const useLinksStore = defineStore('links', () => {
   async function deactivateLink(id) {
     try {
       const { data, error } = await supabase
-        .from('once_links')
-        .update({
-          is_active: false,
-          accessed_at: new Date().toISOString(),
-          access_count: supabase.sql`access_count + 1`
-        })
-        .eq('id', id)
-        .eq('is_active', true)
-        .select()
-        .single()
+        .rpc('deactivate_link_by_id', { link_id: id })
 
       if (error) throw error
+
+      if (!data || data.length === 0) {
+        throw new Error('リンクが見つからないか、既に無効化されています')
+      }
+
+      const linkData = data[0]
 
       // ローカルの状態を更新
       const index = links.value.findIndex(link => link.id === id)
       if (index > -1) {
-        links.value[index] = data
+        links.value[index] = linkData
       }
 
       if (currentLink.value?.id === id) {
-        currentLink.value = data
+        currentLink.value = linkData
       }
 
-      return { data, error: null }
+      return { data: linkData, error: null }
     } catch (error) {
       console.error('リンク無効化エラー:', error)
       return { data: null, error }

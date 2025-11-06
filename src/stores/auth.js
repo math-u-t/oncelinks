@@ -151,6 +151,62 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * 既存のアカウントに新しい認証プロバイダーをリンク
+   * @param {string} provider - プロバイダー名（'github' | 'google'）
+   */
+  async function linkIdentity(provider) {
+    try {
+      loading.value = true
+
+      const { data, error } = await supabase.auth.linkIdentity({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/settings`
+        }
+      })
+
+      if (error) throw error
+
+      return { data, error: null }
+    } catch (error) {
+      console.error(`${provider}アカウントリンクエラー:`, error)
+      return { data: null, error }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * リンクされた認証プロバイダーを解除
+   * @param {string} providerId - プロバイダーID
+   */
+  async function unlinkIdentity(providerId) {
+    try {
+      loading.value = true
+
+      const { data, error } = await supabase.auth.unlinkIdentity({
+        identity_id: providerId
+      })
+
+      if (error) throw error
+
+      return { data, error: null }
+    } catch (error) {
+      console.error('アカウントリンク解除エラー:', error)
+      return { data: null, error }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * ユーザーの全認証プロバイダーを取得
+   */
+  const linkedIdentities = computed(() => {
+    return user.value?.identities || []
+  })
+
   return {
     // State
     user,
@@ -161,12 +217,15 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isAuthenticated,
     userEmail,
+    linkedIdentities,
 
     // Actions
     initialize,
     signInWithProvider,
     signInWithEmail,
     signUpWithEmail,
-    signOut
+    signOut,
+    linkIdentity,
+    unlinkIdentity
   }
 })

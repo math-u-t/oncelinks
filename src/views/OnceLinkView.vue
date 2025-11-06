@@ -56,14 +56,14 @@
         </div>
 
         <!-- HTMLコンテンツ -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 md:p-8">
-          <div class="prose dark:prose-invert max-w-none" v-html="content"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 md:p-12">
+          <div class="prose prose-lg dark:prose-invert max-w-none" v-html="content"></div>
         </div>
 
         <!-- フッター -->
-        <div class="mt-6 text-center">
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Powered by oncelinks
+        <div class="mt-8 text-center">
+          <p class="text-2xl md:text-3xl font-semibold text-gray-600 dark:text-gray-400">
+            shared by oncelinks
           </p>
         </div>
       </div>
