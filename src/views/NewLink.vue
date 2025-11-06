@@ -3,10 +3,10 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- ヘッダー -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           新規リンク作成
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           一度限りアクセス可能なリンクを作成します
         </p>
       </div>

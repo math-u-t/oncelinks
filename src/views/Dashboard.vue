@@ -4,45 +4,45 @@
       <!-- ヘッダー -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             ダッシュボード
           </h1>
-          <p class="text-gray-600 dark:text-gray-400">
+          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             作成したリンクを管理
           </p>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
           <router-link
             to="/trash"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg
                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
                    text-gray-700 dark:text-gray-300
-                   transition-colors"
+                   transition-colors flex-1 sm:flex-initial"
           >
             <span class="material-icons text-sm">delete</span>
-            <span>ゴミ箱</span>
+            <span class="text-sm sm:text-base">ゴミ箱</span>
           </router-link>
 
           <router-link
             to="/settings"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg
                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
                    text-gray-700 dark:text-gray-300
-                   transition-colors"
+                   transition-colors flex-1 sm:flex-initial"
           >
             <span class="material-icons text-sm">settings</span>
-            <span>設定</span>
+            <span class="text-sm sm:text-base">設定</span>
           </router-link>
 
           <router-link
             to="/new"
-            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg
+            class="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg
                    bg-indigo-600 hover:bg-indigo-700 text-white
-                   transition-colors shadow-md hover:shadow-lg"
+                   transition-colors shadow-md hover:shadow-lg w-full sm:w-auto"
           >
-            <span class="material-icons">add</span>
-            <span class="font-medium">新規リンク作成</span>
+            <span class="material-icons text-sm sm:text-base">add</span>
+            <span class="font-medium text-sm sm:text-base">新規リンク作成</span>
           </router-link>
         </div>
       </div>

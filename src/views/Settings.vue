@@ -62,8 +62,67 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               認証プロバイダー
             </label>
-            <div class="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white">
-              {{ getAuthProvider() }}
+            <div class="space-y-3">
+              <div
+                v-for="identity in authStore.linkedIdentities"
+                :key="identity.id"
+                class="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="material-icons text-gray-600 dark:text-gray-400">
+                    {{ getProviderIcon(identity.provider) }}
+                  </span>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ getProviderName(identity.provider) }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ identity.identity_data?.email || identity.identity_data?.full_name || '認証済み' }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="authStore.linkedIdentities.length > 1"
+                  @click="handleUnlinkIdentity(identity.id)"
+                  class="text-xs text-red-600 dark:text-red-400 hover:underline"
+                >
+                  リンク解除
+                </button>
+              </div>
+
+              <!-- 新しいプロバイダーを追加 -->
+              <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  別のログイン方法を追加:
+                </p>
+                <div class="flex gap-2">
+                  <button
+                    v-if="!hasProvider('github')"
+                    @click="handleLinkProvider('github')"
+                    :disabled="linkLoading"
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+                           bg-gray-900 hover:bg-gray-800 text-white text-sm
+                           disabled:opacity-50 disabled:cursor-not-allowed
+                           transition-colors"
+                  >
+                    <span class="material-icons text-sm">add</span>
+                    <span>GitHub</span>
+                  </button>
+                  <button
+                    v-if="!hasProvider('google')"
+                    @click="handleLinkProvider('google')"
+                    :disabled="linkLoading"
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+                           bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600
+                           text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 text-sm
+                           disabled:opacity-50 disabled:cursor-not-allowed
+                           transition-colors"
+                  >
+                    <span class="material-icons text-sm">add</span>
+                    <span>Google</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -198,6 +257,7 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const passwordLoading = ref(false)
 const passwordError = ref('')
+const linkLoading = ref(false)
 
 // メール認証かどうかを判定
 const isEmailAuth = computed(() => {
@@ -205,20 +265,65 @@ const isEmailAuth = computed(() => {
   return identities.length === 0 || identities.some(identity => identity.provider === 'email')
 })
 
-function getAuthProvider() {
-  const identities = authStore.user?.identities || []
-  if (identities.length === 0) return 'Email'
+function getProviderName(provider) {
+  switch (provider) {
+    case 'github': return 'GitHub'
+    case 'google': return 'Google'
+    case 'email': return 'Email'
+    default: return provider
+  }
+}
 
-  const providers = identities.map(identity => {
-    switch (identity.provider) {
-      case 'github': return 'GitHub'
-      case 'google': return 'Google'
-      case 'email': return 'Email'
-      default: return identity.provider
+function getProviderIcon(provider) {
+  switch (provider) {
+    case 'github': return 'code'
+    case 'google': return 'search'
+    case 'email': return 'email'
+    default: return 'account_circle'
+  }
+}
+
+function hasProvider(provider) {
+  const identities = authStore.linkedIdentities || []
+  return identities.some(identity => identity.provider === provider)
+}
+
+async function handleLinkProvider(provider) {
+  linkLoading.value = true
+
+  try {
+    const { error } = await authStore.linkIdentity(provider)
+
+    if (error) {
+      toast.error(`${getProviderName(provider)}のリンクに失敗しました: ${error.message}`)
+    } else {
+      toast.success(`${getProviderName(provider)}をリンクしました`)
     }
-  })
+  } catch (error) {
+    console.error('プロバイダーリンクエラー:', error)
+    toast.error('リンクに失敗しました')
+  } finally {
+    linkLoading.value = false
+  }
+}
 
-  return providers.join(', ')
+async function handleUnlinkIdentity(identityId) {
+  if (!confirm('この認証方法を解除しますか？')) {
+    return
+  }
+
+  try {
+    const { error } = await authStore.unlinkIdentity(identityId)
+
+    if (error) {
+      toast.error('リンク解除に失敗しました: ' + error.message)
+    } else {
+      toast.success('リンクを解除しました')
+    }
+  } catch (error) {
+    console.error('リンク解除エラー:', error)
+    toast.error('リンク解除に失敗しました')
+  }
 }
 
 async function handlePasswordChange() {

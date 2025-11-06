@@ -3,10 +3,10 @@
     <Transition name="modal">
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto"
         @click.self="close"
       >
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 sm:p-8 border border-gray-200 dark:border-gray-700 my-8">
           <!-- ヘッダー -->
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
